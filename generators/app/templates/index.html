@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap-theme.min.css">
+</head>
+<body ng-app="mock">
+    <div ng-view class="container"></div>
+    <!-- create multiple templates and set up routeProvider to switch among them via <a href="#todo">...</a> -->
+    <script type="text/ng-template" id="todo1">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>todo</h2>
+            </div>
+        </div>
+        <div class="row">
+            <!-- do stuff -->
+        </div>
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.1/angular.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.1/angular-route.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module('mock', ['ngRoute']);
+
+        app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
+            $routeProvider.when('/', {
+                templateUrl: 'todo',
+                controller: 'main'
+            })
+            .otherwise({
+                templateUrl: 'todo',
+                controller: 'main'
+            });
+
+            $locationProvider.hashPrefix('');
+        }]);
+
+        // A service that allows the scope data persist across multiple controllers
+        app.factory('multiControllerDataPersistence', function () {
+            var data = {};
+
+            var get = function () {
+                return data;
+            };
+
+            var set = function (updated) {
+                data = updated;
+            }
+
+            var reset = function () {
+                data = {};
+            }
+
+            return {
+                get: get,
+                set: set,
+                reset: reset
+            };
+        });
+
+        app.controller('main', ['$scope', 'multiControllerDataPersistence', function ($scope, multiControllerDataPersistence) {
+            $scope.data = multiControllerDataPersistence.get();
+
+            $scope.$watch('data', function () {
+                multiControllerDataPersistence.set($scope.data);
+            });
+
+//            $scope.changeSomeData = function () {
+//                if (!$scope.data) {
+//                    $scope.data = [];
+//                }
+//
+//                $scope.data.push($scope.data.newSalespoint);
+//            };
+        }]);
+    </script>
+</body>
+</html>
